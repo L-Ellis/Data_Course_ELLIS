@@ -14,3 +14,4 @@ Number, Date, Title
 
 A little like how the updates to Stellaris works. You got the version number, but also the name of some famous sci-fi author. 
 
+It's been a long time though, I'd be surprised if they weren't starting to run out of sci-fi authors at this point. 
