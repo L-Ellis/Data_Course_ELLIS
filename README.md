@@ -17,3 +17,6 @@ A little like how the updates to Stellaris works. You got the version number, bu
 It's been a long time though, I'd be surprised if they weren't starting to run out of sci-fi authors at this point. 
 
 This really isn't the best way to make little comments is it.
+This document gotta get edits somehow.
+
+You may have noticed that I'm commiting stuff at about 4:30 in the morning, I promise, I'm up for other reasons. Not good reasons probably, but other reasons! 
