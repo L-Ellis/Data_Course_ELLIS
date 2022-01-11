@@ -11,3 +11,6 @@ What is "Bird Hippie" supposed to mean?
 Like yeah, it's a memorable update name.
 It's also nice that there's like, three other names for the version.
 Number, Date, Title
+
+A little like how the updates to Stellaris works. You got the version number, but also the name of some famous sci-fi author. 
+
