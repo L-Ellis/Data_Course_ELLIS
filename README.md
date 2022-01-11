@@ -1,5 +1,5 @@
 # Data_Course_ELLIS
-For BIOL 3100 taught by professor Zhan
+For BIOL 3100 taught by professor Zahn
 
 This README file contains information about my uploaded assignments
 
