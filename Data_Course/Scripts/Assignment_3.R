@@ -15,6 +15,72 @@
 
 
 
+###########################
+#                         #
+#    Class 1/25/2022      #
+#                         # 
+###########################
+
+iris 
+class(iris)
+iris$Species
+unique(iris$Species)
+table(iris$Species)
+
+install.packages("easystats", repos = "https://easystats.r-universe.dev")
+library("easystats")
+library("tidyverse")
+
+## dplyr::filter()
+## stats::filter()
+
+iris %>% class()
+iris$Species %>% table()
+
+ggplot(iris, aes(x = Sepal.Width, y = Sepal.Length,color=Petal.Length - Petal.Width)) + 
+  geom_point() +
+  geom_smooth()
+
+iris$Sepal.Length %>% 
+  mean()
+iris$Sepal.Length > 6
+
+setosa <- iris[iris$Species == "setosa",] # Get all from array at indices that match the expression
+setosa$Sepal.Length %>% mean()
+
+versicolor <- iris[iris$Species == "versicolor",] # Get all from array at indices that match the expression
+versicolor$Sepal.Length %>% mean()
+
+verginica <- iris[iris$Species == "verginica",] # Get all from array at indices that match the expression
+verginica$Sepal.Length %>% sd()
+
+iris %>% 
+  group_by(Species) %>% 
+  summarize(MeanSepLength = mean(Sepal.Length), # summarize() Is almost always used after group_by()
+            SDSepLength = sd(Sepal.Length),
+            MinSepLength = min(Sepal.Length))
+
+iris$Sepal.Length %>% summary() # Overall look at a variable, it returns (Min, 1st Qu, Median, Mean, 3rd Qu, Max)
+
+iris %>% 
+  ggplot(aes(x=Sepal.Length,color = Species)) +
+  geom_density()
+
+library(palmerpenguins) # Data set with penguins
+names(penguins) # The name of each variable (column)
+summary(penguins)
+table(penguins$species,penguins$island)
+
+Adelie <- penguins[penguins$species == "Adelie",]
+summary(Adelie)
+
+
+
+###########################
+#                         #
+#         Info            #
+#                         # 
+###########################
 
 # Vector operations! ####
 
@@ -151,29 +217,43 @@ dbinom(50,100,.5) # probability of getting exactly 50 heads out of 100 coin flip
 
 
 
+###########################
+#                         #
+#       Assignment        #
+#                         # 
+###########################
+
 # YOUR REMAINING HOMEWORK ASSIGNMENT (Fill in with code) ####
 
 # 1.  Get a subset of the "iris" data frame where it's just even-numbered rows
 
-seq(2,150,2) # here's the code to get a list of the even numbers between 2 and 150
-
+iris_even <- iris[seq(2,150,2),]
+iris_even
 
 
 # 2.  Create a new object called iris_chr which is a copy of iris, except where every column is a character class
 
-
+iris_chr <- as.character(iris)
+iris_chr
 
 # 3.  Create a new numeric vector object named "Sepal.Area" which is the product of Sepal.Length and Sepal.Width
 
+Sepal.Area <- c(iris$Sepal.Length * iris$Sepal.Width)
+Sepal.Area
 
 
 # 4.  Add Sepal.Area to the iris data frame as a new column
+  # iris_copy <- iris
+  # iris_copy$Sepal.Area <- as.factor(Sepal.Area) # Tested it on a new dataframe because I was worried about breaking something for some reason
 
-
+iris$Sepal.Area <- Sepal.Area
+iris
 
 # 5.  Create a new dataframe that is a subset of iris using only rows where Sepal.Area is greater than 20 
       # (name it big_area_iris)
 
+big_area_iris <- iris[iris$Sepal.Area > 20,]
+big_area_iris
 
 
 # 6.  Upload the last numbered section of this R script (with all answers filled in and tasks completed) 
