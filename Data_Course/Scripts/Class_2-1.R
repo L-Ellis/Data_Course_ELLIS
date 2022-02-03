@@ -16,6 +16,8 @@ ggplot(penguins,aes(x=bill_length_mm,fill=species)) +
 
 
 # Body Mass vs Bill Length
+pal <- c("#FF499E", "#D264B6", "#A480CF", "#779BE7", "#49B6FF")
+
 ggplot(penguins,aes(x=body_mass_g, y=bill_length_mm)) +
   geom_point(aes(color=species), alpha = .5, size = 20) +
   geom_smooth(method="lm", aes(group=species), color="black", se=FALSE) + # or aes(linetype=species) if you want the lines to look different
@@ -23,9 +25,7 @@ ggplot(penguins,aes(x=body_mass_g, y=bill_length_mm)) +
   theme_minimal() + # Changes background
   theme(plot.title = element_text(hjust=0.5)) + # Change margins?
   # scale_color_viridis_d(option = 10) # scale_color_grey to see what it looks like in greyscale
-
-  pal <- c("FF499E", "D264B6", "A480CF", "779BE7", "49B6FF")
-  scale_color_manual(values = pal, aesthetics = c("colour", "fill")) # for creating new color pallets
+  scale_color_manual(values = pal) # for creating new color pallets
 
 
 ggsave("Scripts/myplot2.png", width=6, height=5, dpi=300) # save image to directory
