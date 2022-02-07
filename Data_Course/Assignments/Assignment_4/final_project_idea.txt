@@ -1,0 +1,49 @@
+# imfdb Exploratory Data Analysis
+
+
+---
+
+## The sort of data I'd use:
+imfdb (Internet Movie Firearms Database) is a big wiki that records the appearance of specific models of firearms in various media. 
+The sort of data I would be able to get directly from the website would be: Firearm Name, Firearm Type, Media Title it appears in.
+
+
+---
+
+## Process:
+
+1. Figure out how extract a large dataset from a wiki
+
+2. Import and clean up
+ 
+3. Categorize firearm by manufacturer and model (based on firearm name)
+
+4. Categorize by movie/media title (based on wiki page name)
+
+5. Categorize by firearm "type" (handgun, revolver, shotgun, etc.) (based on content headers)
+
+Extra (these would be a lot of extra work):
+ - Categorize by media genre 
+ based on wiki page category somehow? Would take multiple steps, and I might need to compare the movie name through a separate database.
+ 
+- Categorize by firearm creation year 
+Would be easy for guns that include the year in their name, though I would need to use a separate database for guns without a year in their name.
+Also, what if there is some weird gun with a four digit number in their name that isn't the creation year?
+
+
+---
+
+## Why this?
+Pros:
+- Dataset is amateur so would probably be messy.
+- Instead of being made up of mostly numbers and measurements, it's a bunch unorganized categories and names. So I think that's interesting.
+Cons:
+- I'd have to figure out how to extract a database from elements of a website, which might be well beyond the purpose of this assignment.
+- I just don't really like guns to be honest, but the data's interesting enough I don't mind it.
+
+
+---
+
+http://www.imfdb.org/wiki/Mythbusters
+
+https://www.r-bloggers.com/2020/11/4-r-projects-to-form-a-core-data-analyst-portfolio/
