@@ -38,24 +38,34 @@ str(example_data);
 ###########################
 #                         #
 #     Example Graph       #
-#     (UNFINISHED)        # 
+#      UNFINISHED         # 
 ###########################
+
+
+# Convert nested list to a sensible dataframe
+# TODO fix up the original example_data structure, that has just as many problems.
+
+# library(data.table)
+# dfs <- lapply(example_data, data.frame, stringsAsFactors = FALSE)
+# df_allMedia <- rbindlist(example_data[2], fill=TRUE)
+# ?rbindlist
+
+# firearms_df <- lapply(example_data[2], data.frame, stringsAsFactors = FALSE)
+df_all = list("Firearms" = data.frame, "Media_Titles" = data.frame) # The name arguments here are unnecessary, I just like the readability
+df_all$Firearms <- lapply(example_data$Firearms[], data.frame, stringsAsFactors = FALSE)
+df_all$Media_Titles <- as.data.frame(example_data$Media_Title)
+  
+
+# Graph
 
 install.packages("treemap", dependencies = TRUE)
 library(treemap)
-library(data.table)
-dfs <- lapply(example_data, data.frame, stringsAsFactors = FALSE)
-df_allMedia <- rbindlist(example_data[2], fill=TRUE)
-?rbindlist
 
-df_allMedia <- as.data.frame(example_data)
+# The column name for df_all[["Media_Titles"]][["example_data$Media_Title"]] should not be that.
+treemap(dtf = as.data.frame(df_all$Media_Titles), index = "example_data$Media_Title")
 
-?treemap
-
-treemap() %>% 
-  dtf = 
-
-
+#?tapply
+#?rapply 
 
 
 
