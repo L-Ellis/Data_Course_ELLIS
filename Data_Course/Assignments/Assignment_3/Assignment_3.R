@@ -233,8 +233,27 @@ iris_even
 
 # 2.  Create a new object called iris_chr which is a copy of iris, except where every column is a character class
 
-iris_chr <- as.character(iris)
-iris_chr
+library(tidyverse)
+
+iris_chr <- iris[,] %>% 
+  lapply(FUN=as.character) %>% 
+  as.data.frame()
+
+typeof
+iris_chr[,1]
+
+nrow(iris)
+ncol(iris)
+iris[1,0:5]
+
+
+# iris_chr <- head(iris[c(names(iris))]) %>% 
+  # lapply(FUN=as.character)
+
+
+
+#cols <- as.character(iris)
+#iris_chr[,cols] <- apply(iris_chr[,cols], 2, function(x) as.character(x))
 
 # 3.  Create a new numeric vector object named "Sepal.Area" which is the product of Sepal.Length and Sepal.Width
 
