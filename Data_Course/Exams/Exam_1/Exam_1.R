@@ -93,6 +93,10 @@ state_max_fatality_rate <- state_max_fatality_rate %>%
 
 
 
+# Class's Method # Waaaaay better # I didn't copy it right though!
+# state_max_fatality_rate <- covid_df %>% group_by(Province_State) %>% 
+  # summarise(Maximum_Fatality_Ratio = max(Deaths)) %>% 
+  # na.exclude() # na.rm somewhere??
 
 
 
@@ -127,6 +131,12 @@ state_max_fatality_rate %>%
 
 
 
+# Class's Method
+state_max_fatality_rate %>% 
+  mutate(orderedstate=factor(Province_State,levels=Province_State)) %>% 
+  ggplot(aes(x=orderedstate,y=Maximum_Fatality_Ratio)) +
+  geom_col() + 
+  theme(axis.text.x = element_text(angle=90))
 
 
 
@@ -154,3 +164,11 @@ usa_cumulative_deaths %>%
   theme_bw() +
   scale_x_date()
 
+# Class's method
+covid_df %>% 
+  group_by(Last_Update) %>% 
+  summarise(cumulativedeath = sum(Deaths)) %>%  # That's a line with an improvement
+  ggplot(aes(y=cumulativedeath, x=as.Date(Last_Update))) +
+  geom_point() +
+  theme_bw() +
+  scale_x_date()
