@@ -1,5 +1,12 @@
 library(tidyverse)
 library(ggplot2)
+
+
+###########################
+#                         #
+#      Setup Data         #
+#                         # 
+###########################
 dat <- read_csv("../../Data/BioLog_Plate_Data.csv")
 
 # Clean up Hr_* weirdness
@@ -15,7 +22,7 @@ names(dat) <- names(dat) %>%
   make.names(unique = TRUE)
 
 # How many distinct sample.id's are there?
-dat %>% 
+ dat %>% 
   distinct(Sample.ID)
 
 # Create a new column that says whether the sample came from soil or water
@@ -30,91 +37,100 @@ dat %>%
   distinct(Sample.ID, .keep_all = TRUE)
 
 
-# dat %>% 
-  # distinct(Substrate) %>% 
-  # nrow()
 
 
-# Faceted Graph
-dat <- dat %>% filter(Dilution == 0.1) 
+###########################
+#                         #
+#     Faceted Graph       #
+#                         # 
+###########################
 
-  # Alphabetical order but anything starting with weird characters is put at the end. 
-  # I do this by adding a special character to the beginning of everything starting with a weird character that will bump it to the end of an alphabetical sort
-  # Then, I only use this to order the levels of the actual Substrate data, so the special character is not included in the graph.
+dat_plot1 <- dat %>% filter(Dilution == 0.1) # Very important to do before anything else
 
-non_ASCII_substrate <- dat$Substrate[ grepl(dat$Substrate,pattern="^[^ -~]") ]
-non_ASCII_substrate <- paste0("zzzz", non_ASCII_substrate)
-  # I mean, I could just use zzzzz or something, but this feels cooler. 
-  # https://stackoverflow.com/questions/8086375/what-character-to-use-to-put-an-item-at-the-end-of-an-alphabetic-list
+###########################################################################################################
+#   Sort substrates in alphabetical order but any starting with weird characters is put at the end        #
+#                                                                                                         #
+###########################################################################################################
+# I do this by adding characters to the beginning of everything starting with a weird character that will bump it to the end of an alphabetical sort
+# Then, after changing the levels of a factor, I remove the added characters to prevent NA's caused by unmatching level name.
+# I figure this is kind of an awful way to do this, I was messing around a lot with group_by and group_modify hoping I could sort the groups individually then throw one on top of the other, 
+# but I couldn't do it. So I used this long and hacky method instead, sorry.
 
-ASCII_substrate <- dat$Substrate[ !grepl(x=dat$Substrate,pattern="^[^ -~]") ]
-substrate_order <- unlist(list(non_ASCII_substrate, ASCII_substrate)) # Combine # https://www.geeksforgeeks.org/concatenate-two-given-factor-in-a-single-factor-in-r/
+non_ASCII_substrate <- dat_plot1$Substrate[ grepl(dat_plot1$Substrate,pattern="^[^ -~]") ] # https://stackoverflow.com/questions/34613761/detect-non-ascii-characters-in-a-string
+non_ASCII_substrate <- paste0("z", non_ASCII_substrate) 
+non_ASCII_substrate[grepl(non_ASCII_substrate,pattern="^zγ")] <- paste0("z", non_ASCII_substrate[grepl(non_ASCII_substrate,pattern="^zγ")])  # further bump γ-Hydroxybutyric Acid to the end because that's where it is on the desired graph
+# I mean, I could just use  or something, but for some reason the sorts before everything alphabetically, instead of at the end like it is supposed to? # https://stackoverflow.com/questions/8086375/what-character-to-use-to-put-an-item-at-the-end-of-an-alphabetic-list
 
-dat <- dat %>% mutate(Substrate = factor(x=Substrate, levels = sort(substrate_order))) # no NA's here, but it's not sorted right.
+ASCII_substrate <- dat_plot1$Substrate[ !grepl(x=dat_plot1$Substrate,pattern="^[^ -~]") ]
 
-dat$Substrate %>% view
-sort(substrate_order) %>% view
-dat$Substrate = factor(dat$Substrate,levels = sort(unique(substrate_order))) %>% view #something wrong with unique??? WHERE ARE THE NA's COMING FROM??
+# Combine # https://www.geeksforgeeks.org/concatenate-two-given-factor-in-a-single-factor-in-r/
+ordered_substrate <- unlist(list(non_ASCII_substrate, ASCII_substrate))
 
-dat %>% 
+# Sort the new factor
+ordered_substrate <- factor(ordered_substrate, levels = sort(unique(ordered_substrate)))
+
+# Remove the added characters
+  # I could make the regex a little better, just ask it to remove all repeated z's at the beginning rather than just 1 or 2 # https://stackoverflow.com/questions/1660694/regular-expression-to-match-any-character-being-repeated-more-than-10-times
+levels(ordered_substrate)[grepl(x=levels(ordered_substrate),pattern="^z|^zz")] <- sub("^z|^zz","", levels(ordered_substrate)[grepl(x=levels(ordered_substrate),pattern="^z|^zz")]) 
+
+
+#############
+#   Plot    #                                                                                                                 
+#############
+dat_plot1 %>% 
+  mutate(Substrate = factor(x=Substrate, levels = levels(ordered_substrate))) %>% 
   ggplot(aes(x=Time,y=Absorbance,color=Sample.Source)) +
-  geom_line() +
-  facet_wrap(~ Substrate) +
-  theme_bw() 
+  geom_smooth(method="loess", se=FALSE, fullrange=FALSE, span=1) +
+  ylim(0, 2.0) +
+  facet_wrap(~ Substrate, scales = "fixed") +
+  theme_bw() +
+  theme(strip.background = element_rect(fill="white",color = "white"),
+        panel.border = element_rect(color = "white"),
+        axis.ticks = element_blank()
+        ) +
+  labs(title = "Just dilution 0.1") + 
+  guides(color=guide_legend("Type"))
+  
+
+# http://www.sthda.com/english/wiki/ggplot2-axis-ticks-a-guide-to-customize-tick-marks-and-labels
+
+# The lines look awfully pixelated in the export. I don't know what could be causing that, I'm not sure if it's a problem with how I'm using geom_smooth or not.
 
 
-# Animatated Graph
+
+
+
+###########################
+#                         #
+#     Animated Graph      #
+#                         # 
+###########################
 
 library(gganimate)
 
-
-
-
-
-
-
-
-
-
-
-
+# Filter
+dat_plot2 <- dat %>% 
+  filter(Dilution == 0.001 || 0.01 || 0.1) %>%
+  filter(Substrate == "Itaconic Acid")
   
+# Mean
+dat_plot2 <- dat_plot2 %>% 
+  group_by(Time, Dilution, Sample.ID) %>% 
+  summarise(Mean_absorbance = mean(Absorbance))
+
+# Plot
+dat_plot2 %>% 
+  ggplot(aes(x=Time,y=Mean_absorbance,color=Sample.ID)) + 
+  geom_line() + 
+  facet_wrap(~Dilution) +
+  theme_bw() +
+  theme(strip.background = element_rect(fill="white",color = "white"),
+        panel.border = element_rect(color = "white"),
+        axis.ticks = element_blank() ) +
+  guides(color=guide_legend("Sample ID")) +
+  gganimate::transition_reveal(Time)
 
 
-
-
-# ASCII_substrate <- dat$Substrate[ ! grepl(x=unique(dat$Substrate),pattern="^[^ -~]")]
-# ASCII_substrate <- factor(ASCII_substrate,levels=sort(unique(ASCII_substrate)))
-
-# non_ASCII_substrate <- dat$Substrate[grepl(x=dat$Substrate,pattern="^[^ -~]")]
-# non_ASCII_substrate <- factor(non_ASCII_substrate,levels=sort(unique(non_ASCII_substrate) + (length(unique(ASCII_substrate)) - length(unique(non_ASCII_substrate))))) # place at end
-
-# ordered_substrate <- unlist(list(ASCII_substrate,non_ASCII_substrate)) # https://www.geeksforgeeks.org/concatenate-two-given-factor-in-a-single-factor-in-r/
-# levels(ordered_substrate) %>% view
-
-
-#   group_by(grepl(x=Substrate,pattern="^[^ -~]")) %>% 
-#   group_modify(~ mutate(.x, Substrate = factor(Substrate, levels = unique(sort(dat$Substrate))))) %>% 
-
-# sort_ASCII_last <- function(x) {
-#   paste0("ZZZZ", x)
-# }
-
-# ordered_substrate <- dat$Substrate %>% 
-#   apply(MARGIN = 1, FUN=sort_ASCII_last(x=dat$Substrate[grepl(pattern="^[^ -~]")]))
-  
-# group_by(grepl(x=Substrate,pattern="^[^ -~]")) %>% 
-# group_map(~ mutate(Substrate = factor(dat$Substrate, levels = unique(dat$Substrate))), data = .x)
-
-# group by pattern, sort each group alphabetically, merge groups so that levels of group 2 are appended to the end
-
-# group_by anything starting with non-ASCII characters # https://stackoverflow.com/questions/34613761/detect-non-ascii-characters-in-a-string
-
-# mutate(Substrate = factor(x=Substrate,levels=levels(ordered_substrate))) %>% # - levels()
-
-
-any(is.na(substrate_order))
-any(is.na(dat$Substrate))
 
 
 
