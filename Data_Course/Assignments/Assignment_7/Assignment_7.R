@@ -4,11 +4,17 @@ library(dplyr)
 library(modelr)
 library(easystats)
 library(GGally)
+library(purrr)
 
 airlines = read.csv("airlines.csv")
 airports = read.csv("airports.csv")
 flights = read.csv("jan_flights.csv")
 snowfall = read.csv("Jan_snowfall.csv")
+
+# Class
+files = c("airlines.csv", "airports.csv", "jan_flights.csv", "Jan_snowfall.csv")
+df = map(files, read.csv)
+# 
 
 ###################################################################################                                                                  #
 #   Combine the data sets appropriately to investigate whether                    #
@@ -135,7 +141,7 @@ avg_delay %>%
   geom_col(position = "dodge") +
   facet_wrap(~GOING) +
   labs(title = "Effect of Snowfall on Arrival and Departure Delays", y = "Amount", fill = "")
-  
+
 # ok, so I sort of gave up a little here. I'm on hour three and am absolutely hitting a brick wall.
 # what I WANTED to do was have a grouped bar chart with two subgroups,
 # which I was ALMOST able to get by just throwing in foo = GOING into aes,
