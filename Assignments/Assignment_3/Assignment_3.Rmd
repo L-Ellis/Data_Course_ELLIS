@@ -1,0 +1,36 @@
+---
+output: 
+html_document:
+  number_sections=TRUE
+pagetitle: Assignment_3
+---
+
+
+# **Assignment 3**
+
+In this assignment you will:
+
++ Complete the work we start in class by filling in the [Assignment_3 R script](https://gzahn.github.io/data-course/Repository/Assignments/Assignment_3/Assignment_3.R){target="_blank"} 
+  + Work with vectors and type conversions
+  + Perform simple summaries of numeric data
+  + Logical evaluations
+  + Subsetting
+
+__________
+
+
+## **For credit ...**
+
+1.  Copy the numbered section (including your code) into a txt file and upload it to Canvas
+2.  Push that same complete file to your GitHub repository
+
+I should be able to pull your GitHub repo and see your updated Assignment_3.R file, and also see the answers to the last section in Canvas.
+
+__________
+
+We will be using an R script called "Assignment_3.R"
+
+We will work through this script in class, pausing to understand what's going on at each point.
+
+**Some of the script is intentionally left blank. You will fill in the gaps as we go and finish it on your own.**
+
