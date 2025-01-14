@@ -1,3 +1,5 @@
+Edit 1
+
 # Data Analysis Course - Utah Valley University
 
 This site serves as a repository for all class material.
