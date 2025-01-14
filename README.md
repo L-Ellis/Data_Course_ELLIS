@@ -1,6 +1,10 @@
-Edit 10
+# Leah's fork of UVU's Data Analysis Course... the II. :) (I'm retaking the course.)
 
-# Data Analysis Course - Utah Valley University
+# From: https://gzahn.github.io/data-course/
+
+---
+
+## Data Analysis Course - Utah Valley University
 
 This site serves as a repository for all class material.
 
