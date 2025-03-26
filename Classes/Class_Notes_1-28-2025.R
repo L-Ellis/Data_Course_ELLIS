@@ -46,4 +46,4 @@ my_mtcars <- apply(my_mtcars, 2, as.character)
 my_mtcars %>% as.data.frame %>% str
 
 ## 4. Write into a csv file
-write.csv(mtcars, paste0(getwd(),'/Classes/class_practice_1-28-2025.csv'), row.names = F)
+write.csv(mtcars, paste0(getwd(),'/Classes/Data/class_practice_1-28-2025.csv'), row.names = F)
