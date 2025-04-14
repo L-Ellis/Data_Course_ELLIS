@@ -1,10 +1,12 @@
 # Leah Ellis - Assignment 6
 # 03/25/2025
 
+# install.packages("gganimate")
+
 library(tidyverse)
 library(gganimate)
 
-dat <- read_csv("Data/BioLog_Plate_Data.csv")
+dat <- read_csv("../../Data/BioLog_Plate_Data.csv")
 
 ## Clean Data
 
