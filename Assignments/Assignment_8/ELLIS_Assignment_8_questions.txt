@@ -1,0 +1,21 @@
+# Are any of your predicted response values from your best model scientifically meaningless? Explain.
+
+#   When ranges go beyond already observed values, the model tends to predict impossibly high growth rates. 
+
+# In your plots, did you find any non-linear relationships? 
+
+#   It appears as if all plots contain non-linear relationships, judging by how wildly inaccurate the linear models fit for them. However, I am keenly aware of the possibility that I totally messed something up here... it kind of looks like it.
+
+
+# Do a bit of research online and give a link to at least one resource explaining how to deal with modeling non-linear relationships in R.
+
+#   https://www.geeksforgeeks.org/non-linear-regression-in-r/
+#   https://tuos-bio-data-skills.github.io/intro-stats-book/non-linear-regression-in-R.html   
+
+
+# Write the code you would use to model the data found in “/Data/non_linear_relationship.csv” with a linear model (there are a few ways of doing this)
+
+#   # I do not know near enough math to find the appropriate values for this function, however it would look something like this:
+#   nl <- read.csv("../../Data/non_linear_relationship.csv")
+#   nl %>% ggplot(aes(x=predictor,y=response)) + geom_point()
+#   nl_mod1 <- nl %>% nls(data=., predictor ~ SSlogis(response, 4.4, 2.2, 0.266))
