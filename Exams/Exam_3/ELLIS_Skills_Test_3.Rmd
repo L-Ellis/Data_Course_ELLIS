@@ -9,10 +9,9 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Exam 3 - Leah Ellis
+## Hi! 
 
-Hi! Welcome to my exam 3 submission :D
-
+Welcome to my exam 3 submission :D
 
 ## Libraries
 
@@ -27,7 +26,6 @@ library(ggpubr)
 library(broom)
 library(AICcmodavg)
 ```
-
 
 ## Load and clean the data
 
@@ -70,9 +68,9 @@ df4 <- full_join(df4, df3, by)
 
 ## Recreate the graph
 
-Now that the data is managable, it's time to re-create the graph.
+Now that the data is manageable, it's time to re-create the graph.
 
-```{r 4}
+```{r 4, warning=FALSE}
 
 df_g <- df4 %>%
   filter(Tier == "I" | Tier == "IIA" | Tier == "IIB") %>% 
@@ -101,36 +99,60 @@ summary(aov1)
 ```
 Running it through a two-way ANOVA, we can see that there is at least a small correlation from both Tier and Faculty Rank/Title to the avg_salary of any member of faculty.
 
-## Juniper
+## Juniper Oils
 
-
+First we take a look at, and then clean the data.
+Raw Data:
 ```{r j1}
 jo_df_raw <- read.csv("Juniper_Oils.csv")
+glimpse(jo_df_raw)
+```
 
-
+Clean:
+```{r j2, message=FALSE, warning=FALSE, error=FALSE}
 chemlist <- c("alpha-pinene","para-cymene","alpha-terpineol","cedr-9-ene","alpha-cedrene","beta-cedrene","cis-thujopsene","alpha-himachalene","beta-chamigrene","cuparene","compound 1","alpha-chamigrene","widdrol","cedrol","beta-acorenol","alpha-acorenol","gamma-eudesmol","beta-eudesmol","alpha-eudesmol","cedr-8-en-13-ol","cedr-8-en-15-ol","compound 2","thujopsenal")
 
 chemlist2 <- c("alpha.pinene","para.cymene","alpha.terpineol","cedr.9.ene","alpha.cedrene","beta.cedrene","cis.thujopsene","alpha.himachalene","beta.chamigrene","cuparene","compound.1","alpha.chamigrene","widdrol","cedrol","beta.acorenol","alpha.acorenol","gamma.eudesmol","beta.eudesmol","alpha.eudesmol","cedr.8.en.13.ol","cedr.8.en.15.ol","compound.2","thujopsenal")
 
 jo_df <- jo_df_raw %>% 
-  select(chemlist2)
+  select(SampleID, YearsSinceBurn, chemlist2) %>% 
+  pivot_longer(cols = chemlist2, names_to = "ChemicalID", values_to = "Concentration")
   
-  # pivot_longer(cols=chemlist2, )
-
-
-
+glimpse(jo_df)
 
 ```
 
- 
+Then, I replicate the plot.
+```{r j3, warning=FALSE}
 
+jo_df %>% 
+  ggplot(aes(x=YearsSinceBurn, y=Concentration)) + 
+  facet_wrap(vars(ChemicalID), scales = "free") +
+  geom_smooth() +
+  theme_minimal()
 
+```
+## GLM Models
 
+Now I'll make a generalized linear model to find which chemicals that are P < 0.05 affected by "Years Since Burn" 
 
+```{r j4}
 
+mod1 <- jo_df %>% glm(data=., Concentration ~ YearsSinceBurn + ChemicalID)
 
+tidy(mod1) %>%
+  mutate(term = str_remove(term, '^ChemicalID')) %>% 
+  filter(p.value < 0.05) %>% 
+  arrange(term) %>% 
+  print()
 
+```
 
+## Conclusion
 
+All done, hope it's okay it's about twenty minutes late at this point :p
+I submitted a less complete version of this right before the clock rung twelve, this finished version I imagine could be treated as a resubmission... which I imagine aren't allowed. Ah well, it was fun to finish it at least. I like broom I think.
 
+Cya!
 
+  - Leah Ellis
