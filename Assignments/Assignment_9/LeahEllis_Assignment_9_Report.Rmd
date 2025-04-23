@@ -1,0 +1,122 @@
+---
+title: "Assignment 9 Report"
+author: "Leah Ellis"
+date: "2025-04-22"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Gradschool Admissions
+
+The libraries used in this project are as follows:
+```{r libraries, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(modelr)
+library(easystats)
+library(GGally)
+library(patchwork)
+```
+
+
+First, let's read the data from the .csv file and give it a look.
+```{r load_data}
+df <- read.csv("../../Data/GradSchool_Admissions.csv") %>% glimpse
+```
+Hmm... there's nothing blatantly bizarre with how this dataset is organized, but we could do a little bit of tidying at least.
+
+```{r clean_data_p01}
+df_clean <- df %>% 
+  mutate(admit = ifelse(admit == 1, "True", "False")) %>%
+  mutate(across(admit, as.factor)) %>%
+  mutate(admit = factor(admit, levels=c("False", "True")))
+```
+
+Let's use dplyr::mutate to change the 0 and 1 in the admit column to the much more "this-is-categorical-data" looking "True" and "False". I also used the "mutate(across(...))" trick to change it into an ordered factor instead of a string. It feels more right to me that way, and it saves time later when labelling the graphs.
+
+Speaking of graphs... let's rename the columns too.
+```{r clean_data_p02}
+df_clean <- df_clean %>%
+  rename(Admit = admit) %>% 
+  rename(GRE = gre) %>% 
+  rename(GPA = gpa) %>% 
+  rename(Rank = rank)
+
+df_clean %>% glimpse 
+
+```
+
+That looks a lot more tidy to me.
+
+## Exploration
+
+Now let's poke at what this dataset is actually trying to say.
+```{r explore_p01, message=FALSE, warning=FALSE}
+df_clean %>% select(Rank, Admit, GPA, GRE) %>% 
+  GGally::ggpairs(aes(alpha=0.75, colour=Admit, fill = Admit)) + theme_minimal() + scale_color_brewer(palette="Set1") + scale_fill_brewer(palette="Set1")
+```
+
+GPA and GRE both have an effect on chance of admission, but it is smaller than one might expect. Let's further seperate it by the rank of the admitting school.
+
+```{r explore_p02, echo=FALSE, message=FALSE, warning=FALSE}
+df_clean %>% filter(Rank == 4) %>% select(Admit, GPA, GRE) %>% ggpairs(aes(alpha=0.75, colour=Admit,fill=Admit)) + ggtitle("Rank-4 Schools") + theme_minimal() + scale_color_brewer(palette="Set1") + scale_fill_brewer(palette="Set1")
+
+df_clean %>% filter(Rank == 3) %>% select(Admit, GPA, GRE) %>% ggpairs(aes(alpha=0.75, colour=Admit,fill=Admit)) + ggtitle("Rank-3 Schools") + theme_minimal() + scale_color_brewer(palette="Set1") + scale_fill_brewer(palette="Set1")
+
+df_clean %>% filter(Rank == 2) %>% select(Admit, GPA, GRE) %>% ggpairs(aes(alpha=0.75, colour=Admit,fill=Admit)) + ggtitle("Rank-2 Schools") + theme_minimal() + scale_color_brewer(palette="Set1") + scale_fill_brewer(palette="Set1")
+
+df_clean %>% filter(Rank == 1) %>% select(Admit, GPA, GRE) %>% ggpairs(aes(alpha=0.75, colour=Admit,fill=Admit)) + ggtitle("Rank-1 Schools") + theme_minimal() + scale_color_brewer(palette="Set1") + scale_fill_brewer(palette="Set1")
+```
+
+It looks like tougher schools (Rank 4?) are a bit rougher on GPA's then lower rank schools- however, there are still a scattering of admissions across lower GPA's even in the higher rank schools- which I find interesting.
+
+Also of note, the assignment description says that the schools are ordered so that Rank 1 schools are "top-tier":
+```
+the other columns are the GRE score, the GPA, and the rank of the undergraduate institution, where I is “top-tier.”
+```
+However, all of the data seems to point that being the contrary- with Rank 4 schools having the smallest proportion of accepted admissions.
+
+# Modelling the Data
+
+Now that we've taken a good look at the data, it's time to make some models.
+I have chosen to try to make multiple generalized linear regression model to predict whether or not a student will be admitted to a school based off of the schools rank, and the student's GPA and GRE.
+The family of the linear regresion model must be set to "binomial" given it is trying to predict a Boolean state (https://stats.stackexchange.com/questions/524510/logistic-regression-what-is-the-link-between-the-binomial-family-and-the-binomi).
+
+```{r model_p01}
+mod1 <- df_clean %>% glm(data=., family="binomial", Admit ~ GPA)
+mod2 <- df_clean %>% glm(data=., family="binomial", Admit ~ GRE)
+mod3 <- df_clean %>% glm(data=., family="binomial", Admit ~ Rank)
+mod4 <- df_clean %>% glm(data=., family="binomial", Admit ~ Rank:GRE)
+mod5 <- df_clean %>% glm(data=., family="binomial", Admit ~ Rank:GPA)
+mod6 <- df_clean %>% glm(data=., family="binomial", Admit ~ Rank:GPA:GRE)
+```
+
+As per the example.knit from the gzhan github, I also tried using stepAIC on a very complicated model.
+```{r model_p02}
+mod7 <- df_clean %>% glm(data=., family="binomial", Admit ~ Rank * GPA * GRE)
+mod8 <- df_clean %>% glm(data=., family="binomial", formula=MASS::stepAIC(mod7,trace=0))
+```
+
+Initially, let's look at the mean square deviations alone. 
+```{r model_p03}
+model_msds <- data.frame(
+  names=c("mod1","mod2","mod3","mod4","mod5","mod6","mod7","mod8"),
+  values=c(mean(mod1$residuals^2),mean(mod2$residuals^2),mean(mod3$residuals^2),mean(mod4$residuals^2),mean(mod5$residuals^2),mean(mod6$residuals^2),mean(mod7$residuals^2),mean(mod8$residuals^2)))
+
+model_msds %>% arrange(model_msds$values)
+```
+It appears as if model 6 is the best model. 
+
+However, let's try a more complicated analysis.
+```{r model_p04, message=FALSE, warning=FALSE}
+compare_performance(mod1,mod2,mod3,mod4,mod5,mod6,mod7,mod8, rank=TRUE)
+compare_performance(mod1,mod2,mod3,mod4,mod5,mod6,mod7,mod8, rank=TRUE) %>% plot
+```
+Now- it looks like model 8 is the most performant.
+
+# Oops!
+
+Given how sort I am currently on time- I will end this assigment here.
+I feel that I was thorough for the section I did do at least.
+Thank's for reading :)
