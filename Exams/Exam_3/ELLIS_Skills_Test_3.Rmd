@@ -1,0 +1,136 @@
+---
+title: "Exam 3"
+author: "Leah Ellis"
+date: "2025-04-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exam 3 - Leah Ellis
+
+Hi! Welcome to my exam 3 submission :D
+
+
+## Libraries
+
+These are the libraries I used
+```{r 0, warning=FALSE,message=FALSE}
+library(tidyverse)
+library(modelr)
+library(easystats)
+library(GGally)
+library(patchwork)
+library(ggpubr)
+library(broom)
+library(AICcmodavg)
+```
+
+
+## Load and clean the data
+
+Start by reading the data and taking a look at how it is organized.
+```{r 1}
+df_raw <- read.csv("FacultySalaries_1995.csv")
+glimpse(df_raw)
+```
+Alright... this looks like a mess but I cannot quite tell how to clean this just yet...
+All data types are correct, so it seems.
+The FacultyAll seems to just be a sum of all the other num columns, so that could be considered a bit extra- but I don't know if removing it would actually help it be more readible. There's a chance that there is faculty included in the total sum that are not profs or instructors- it's a little vague in that way.
+
+Wait... maybe I see one way to fix this mess.
+
+Let's start by removing these pesky combined variables.
+```{r 2}
+df <- df_raw %>% select(-AvgProfSalaryAll, -AvgProfCompAll, -NumFacultyAll)
+
+```
+
+Then let's make some hefty use of pivot_longer and chaining some joining together.
+```{r 3}
+
+titlePattern='(Instructor|FullProf|AssocProf|AssistProf)'
+
+df1 <- df %>% select(FedID, UnivName, State, Tier, NumFullProfs, NumAssocProfs, NumAssistProfs, NumInstructors) %>% 
+  pivot_longer(cols = starts_with("Num"), names_to = "Title", names_pattern = titlePattern, values_to = "Count")
+
+df2 <- df %>% select(FedID, UnivName, State, Tier, AvgFullProfComp, AvgAssocProfComp, AvgAssistProfComp) %>% 
+  pivot_longer(cols=contains("Comp"), names_to = "Title", names_pattern = titlePattern, values_to = "Avg_Comp")
+
+df3 <- df %>% select(FedID, UnivName, State, Tier, AvgFullProfSalary, AvgAssocProfSalary, AvgAssistProfSalary) %>% 
+  pivot_longer(cols=contains("Salary"), names_to = "Title", names_pattern = titlePattern, values_to = "Avg_Salary")
+
+by <- join_by(FedID, UnivName, State, Tier, Title) 
+df4 <- full_join(df1, df2, by)
+df4 <- full_join(df4, df3, by)
+```
+
+
+## Recreate the graph
+
+Now that the data is managable, it's time to re-create the graph.
+
+```{r 4}
+
+df_g <- df4 %>%
+  filter(Tier == "I" | Tier == "IIA" | Tier == "IIB") %>% 
+  mutate(Title = case_when(
+    Title == "AssistProf" ~ "Assist",
+    Title == "AssocProf" ~ "Assoc",
+    Title == "FullProf" ~ "Full"
+  )) %>%
+  filter(!is.na(Title)) %>% 
+  rename(Salary = Avg_Salary) %>% 
+  rename(Rank = Title)
+
+df_g %>% 
+  ggplot(aes(x=Rank, y=Salary, fill=Rank)) +
+  facet_wrap(vars(Tier)) +
+  geom_boxplot(alpha=1) +
+  theme_minimal() 
+```
+That's pretty much exact, I'd say.
+
+## ANOVA
+
+```{r anova1}
+aov1 <- df4 %>% aov(data=., Avg_Salary ~ Tier + Title)
+summary(aov1)
+```
+Running it through a two-way ANOVA, we can see that there is at least a small correlation from both Tier and Faculty Rank/Title to the avg_salary of any member of faculty.
+
+## Juniper
+
+
+```{r j1}
+jo_df_raw <- read.csv("Juniper_Oils.csv")
+
+
+chemlist <- c("alpha-pinene","para-cymene","alpha-terpineol","cedr-9-ene","alpha-cedrene","beta-cedrene","cis-thujopsene","alpha-himachalene","beta-chamigrene","cuparene","compound 1","alpha-chamigrene","widdrol","cedrol","beta-acorenol","alpha-acorenol","gamma-eudesmol","beta-eudesmol","alpha-eudesmol","cedr-8-en-13-ol","cedr-8-en-15-ol","compound 2","thujopsenal")
+
+chemlist2 <- c("alpha.pinene","para.cymene","alpha.terpineol","cedr.9.ene","alpha.cedrene","beta.cedrene","cis.thujopsene","alpha.himachalene","beta.chamigrene","cuparene","compound.1","alpha.chamigrene","widdrol","cedrol","beta.acorenol","alpha.acorenol","gamma.eudesmol","beta.eudesmol","alpha.eudesmol","cedr.8.en.13.ol","cedr.8.en.15.ol","compound.2","thujopsenal")
+
+jo_df <- jo_df_raw %>% 
+  select(chemlist2)
+  
+  # pivot_longer(cols=chemlist2, )
+
+
+
+
+```
+
+ 
+
+
+
+
+
+
+
+
+
+
+
