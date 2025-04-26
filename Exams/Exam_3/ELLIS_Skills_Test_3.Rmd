@@ -94,7 +94,7 @@ That's pretty much exact, I'd say.
 ## ANOVA
 
 ```{r anova1}
-aov1 <- df4 %>% aov(data=., Avg_Salary ~ Tier + Title)
+aov1 <- df4 %>% aov(data=., Avg_Salary ~ Tier + Title + State)
 summary(aov1)
 ```
 Running it through a two-way ANOVA, we can see that there is at least a small correlation from both Tier and Faculty Rank/Title to the avg_salary of any member of faculty.
