@@ -450,12 +450,13 @@ That’s pretty much exact, I’d say.</p>
 </div>
 <div id="anova" class="section level2">
 <h2>ANOVA</h2>
-<pre class="r"><code>aov1 &lt;- df4 %&gt;% aov(data=., Avg_Salary ~ Tier + Title)
+<pre class="r"><code>aov1 &lt;- df4 %&gt;% aov(data=., Avg_Salary ~ Tier + Title + State)
 summary(aov1)</code></pre>
 <pre><code>##               Df   Sum Sq Mean Sq F value Pr(&gt;F)    
-## Tier           3  8134277 2711426   546.5 &lt;2e-16 ***
-## Title          2 16524385 8262192  1665.3 &lt;2e-16 ***
-## Residuals   3349 16615937    4961                   
+## Tier           3  8134277 2711426  746.03 &lt;2e-16 ***
+## Title          2 16524385 8262192 2273.30 &lt;2e-16 ***
+## State         50  4625865   92517   25.46 &lt;2e-16 ***
+## Residuals   3299 11990072    3634                   
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 1289 observations deleted due to missingness</code></pre>
